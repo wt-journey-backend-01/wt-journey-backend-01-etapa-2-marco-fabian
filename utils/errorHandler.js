@@ -9,17 +9,19 @@ class APIError extends Error {
 }
 
 function errorHandler(err, req, res, next) {
-    let error = { ...err };
-    error.message = err.message;
-    
     console.error(err);
 
     if (err.isOperational) {
-        return res.status(err.statusCode).json({
+        const response = {
             status: err.statusCode,
-            message: err.message,
-            ...(err.errors && { errors: err.errors })
-        });
+            message: err.message
+        };
+
+        if (err.errors) {
+            response.errors = err.errors;
+        }
+
+        return res.status(err.statusCode).json(response);
     }
 
     res.status(500).json({
@@ -27,7 +29,6 @@ function errorHandler(err, req, res, next) {
         message: 'Erro interno do servidor'
     });
 }
-
 
 function createValidationError(message, errors) {
     return new APIError(message, 400, errors);
