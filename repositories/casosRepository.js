@@ -13,7 +13,7 @@ const casos = [
         titulo: "roubo a banco",
         descricao: "Assalto ao Banco Central na Av. Paulista às 14:30. Três indivíduos armados renderam funcionários e clientes, levando aproximadamente R$ 250.000.",
         status: "solucionado",
-        agente_id: "7e8f9a0b-1c2d-3e4f-5a6b-7c8d9e0f1a2b"
+        agente_id: "7e8f9a0b-1c2d-4e3f-9a6b-7c8d9e0f1a2b"
     },
     {
         id: "3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f",
