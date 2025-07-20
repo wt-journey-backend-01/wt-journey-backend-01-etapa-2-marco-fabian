@@ -14,19 +14,19 @@ const agentes = [
         cargo: "inspetor"
     },
     {
-        id: "2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e",
+        id: "2b3c4d5e-6f7a-4b9c-8d1e-2f3a4b5c6d7e",
         nome: "Carlos Santos",
         dataDeIncorporacao: "2015-07-22",
         cargo: "inspetor"
     },
     {
-        id: "9f8e7d6c-5b4a-3928-1706-8592a1b0c3d4",
+        id: "9f8e7d6c-5b4a-4928-a706-8592a1b0c3d4",
         nome: "Maria Fernandes",
         dataDeIncorporacao: "2005-11-08",
         cargo: "delegado"
     },
     {
-        id: "6c5b4a39-2817-0695-8d7e-5a4b3c2d1e0f",
+        id: "6c5b4a39-2817-4695-bd7e-5a4b3c2d1e0f",
         nome: "José Pereira",
         dataDeIncorporacao: "2018-01-12",
         cargo: "inspetor"

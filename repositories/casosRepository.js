@@ -16,28 +16,28 @@ const casos = [
         agente_id: "7e8f9a0b-1c2d-4e3f-9a6b-7c8d9e0f1a2b"
     },
     {
-        id: "3c2d1e0f-9a8b-7c6d-5e4f-3a2b1c0d9e8f",
+        id: "3c2d1e0f-9a8b-47c6-b5e4-3a2b1c0d9e8f",
         titulo: "sequestro",
         descricao: "Empresário de 52 anos foi sequestrado no estacionamento de shopping. Família recebeu pedido de resgate de R$ 500.000.",
         status: "aberto",
-        agente_id: "2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+        agente_id: "2b3c4d5e-6f7a-4b9c-8d1e-2f3a4b5c6d7e"
     },
     {
-        id: "9e8f7a6b-5c4d-3e2f-1a0b-9c8d7e6f5a4b",
+        id: "9e8f7a6b-5c4d-4e2f-aa0b-9c8d7e6f5a4b",
         titulo: "tráfico de drogas",
         descricao: "Operação no bairro da Liberdade resultou na apreensão de 50kg de cocaína e prisão de 12 suspeitos envolvidos na rede de distribuição.",
         status: "solucionado",
-        agente_id: "9f8e7d6c-5b4a-3928-1706-8592a1b0c3d4"
+        agente_id: "9f8e7d6c-5b4a-4928-a706-8592a1b0c3d4"
     },
     {
-        id: "5d4c3b2a-1098-7e6f-5a4b-3c2d1e0f9a8b",
+        id: "5d4c3b2a-1098-47e6-b5a4-3c2d1e0f9a8b",
         titulo: "fraude eletrônica",
         descricao: "Esquema de phishing em aplicativo bancário resultou em prejuízo de R$ 1.2 milhão para mais de 200 vítimas.",
         status: "aberto",
-        agente_id: "6c5b4a39-2817-0695-8d7e-5a4b3c2d1e0f"
+        agente_id: "6c5b4a39-2817-4695-bd7e-5a4b3c2d1e0f"
     },
     {
-        id: "7f6e5d4c-3b2a-1908-7e6f-5a4b3c2d1e0f",
+        id: "7f6e5d4c-3b2a-4908-a7e6-5a4b3c2d1e0f",
         titulo: "furto de veículos",
         descricao: "Quadrilha especializada em furto de carros de luxo foi identificada. Suspeitos agiam principalmente em estacionamentos de shopping centers.",
         status: "aberto",
