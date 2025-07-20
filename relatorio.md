@@ -1,291 +1,241 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 6 créditos restantes para usar o sistema de feedback AI.
+Você tem 5 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para marco-fabian:
 
 Nota final: **25.8/100**
 
-# Feedback para o Marco Fabian 🚓✨
+# Feedback para Marco Fabian 🚓✨
 
-Olá, Marco! Primeiro, quero parabenizar você pelo esforço e pelo código que enviou. 🎉 Você estruturou seu projeto com uma organização muito boa: separou as rotas, controllers, repositories e até um arquivo para tratamento de erros (`utils/errorHandler.js`). Isso já é um grande passo para construir uma API escalável e fácil de manter! 👏👏
-
-Também notei que você implementou corretamente as rotas para `/agentes` e `/casos`, com todos os métodos HTTP principais (GET, POST, PUT, PATCH, DELETE). Além disso, você fez validações importantes nos controllers, como verificar se o ID é um UUID válido, validar campos obrigatórios e até conferir se o agente existe ao criar ou atualizar um caso. Isso mostra que você entendeu bem a importância de garantir a integridade dos dados! 💪
+Olá, Marco! Primeiro, quero parabenizá-lo pelo esforço e pelo trabalho que você já entregou nessa API para o Departamento de Polícia! 🎉 Seu projeto está bem estruturado em termos de arquivos, com rotas, controllers, repositories e utils bem organizados, seguindo a arquitetura modular que é fundamental para projetos escaláveis. Isso já é um baita avanço! 👏
 
 ---
 
-# Agora, vamos aos pontos que precisam de atenção para destravar seu projeto e melhorar bastante sua API! 🕵️‍♂️🔍
+## O que você mandou bem! 👏
+
+- **Organização do projeto:** Você separou muito bem as responsabilidades entre rotas, controllers e repositories. Por exemplo, no arquivo `routes/agentesRoutes.js` você definiu todas as rotas do recurso `/agentes` usando o `express.Router()`, e no `controllers/agentesController.js` implementou as funções que lidam com as requisições. Isso é ótimo para manter o código limpo e fácil de manter.
+
+- **Validações e tratamento de erros:** Vi que você implementou validações de UUID, campos obrigatórios, formatos de data e valores permitidos (como o cargo do agente ser "inspetor" ou "delegado"). Além disso, está usando um middleware `errorHandler` para centralizar o tratamento de erros, o que é uma prática recomendada.
+
+- **Conquistas bônus:** Mesmo que alguns testes bônus não tenham passado, percebi que você tentou implementar filtros, ordenação, e mensagens de erro customizadas, como no método `getAllAgentes` onde você filtra por cargo e ordena por data de incorporação. Isso mostra que você está buscando ir além do básico, e isso é muito legal! 🚀
 
 ---
 
-## 1. IDs usados no seu projeto NÃO estão no formato UUID correto
+## Onde podemos melhorar? Vamos juntos entender o que está acontecendo! 🔍
 
-### O que eu vi:
-No seu arquivo `repositories/agentesRepository.js`, você tem os agentes já cadastrados com IDs como:
+### 1. IDs usados para agentes e casos não são UUIDs válidos
 
-```js
-{
-    id: "6c5b4a39-2817-0695-8d7e-5a4b3c2d1e0f",
-    nome: "José Pereira",
-    dataDeIncorporacao: "2018-01-12",
-    cargo: "inspetor"
-}
-```
+Uma penalidade importante que apareceu no seu projeto foi que os IDs dos agentes e dos casos não são UUIDs válidos. Isso é crucial porque a API exige que os IDs sejam UUIDs para garantir unicidade e formato correto.
 
-E no `casosRepository.js`, um exemplo:
+Por exemplo, no seu arquivo `repositories/casosRepository.js`, você tem um caso com ID:
 
 ```js
 {
     id: "8b7a6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d",
     titulo: "roubo a banco",
-    descricao: "...",
-    status: "solucionado",
-    agente_id: "7e8f9a0b-1c2d-4e3f-9a6b-7c8d9e0f1a2b"
+    // ...
 }
 ```
 
-Esses IDs parecem no formato UUID, mas **não são UUIDs válidos**. Eles têm segmentos com menos de 4 caracteres, e o padrão UUID v4 tem um formato fixo: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx` (8-4-4-4-12 caracteres, com o 13º caractere sempre `4` para UUID v4).
+Repare que esse ID não é um UUID válido, pois um UUID tem o formato `xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx` (com M e N seguindo regras específicas). O seu ID tem um segmento com 3 caracteres (`2a1b`), o que não bate com o padrão.
 
-### Por que isso importa?
-
-No seu código, você faz validação com a função `validateUUID(id)` (provavelmente usando regex ou alguma biblioteca), que exige que o ID seja um UUID válido. Como os IDs iniciais não são UUIDs válidos, essa validação falha e seu sistema entende que o recurso não existe, gerando erros 404 ou 400.
-
-### Como corrigir?
-
-Você deve substituir os IDs fixos no array inicial por UUIDs válidos. Como você já usa a biblioteca `uuid` (que gera UUIDs corretos), recomendo gerar novos IDs válidos para seus dados iniciais. Por exemplo:
+O mesmo acontece para alguns agentes, por exemplo:
 
 ```js
-// Exemplo de um UUID válido
-const exemploUUID = "401bccf5-cf9e-489d-8412-446cd169a0f1a"; // Esse parece válido, mas outros não.
+{
+    id: "6c5b4a39-2817-4695-bd7e-5a4b3c2d1e0f",
+    nome: "José Pereira",
+    // ...
+}
+```
 
-// Para garantir, gere novos UUIDs assim:
-const { v4: uuidv4 } = require('uuid');
+Esse ID tem um segmento com 7 caracteres (`bd7e`), que não é válido para UUID.
 
+**Por que isso é importante?**  
+Seu código faz muitas validações de UUID, por exemplo:
+
+```js
+if (!validateUUID(id)) {
+    throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
+}
+```
+
+Mas como os IDs iniciais não são UUIDs válidos, qualquer busca, atualização ou deleção usando esses IDs vai falhar, retornando erro 400 ou 404, mesmo que o recurso exista na memória.
+
+**Como corrigir?**  
+Você deve substituir todos os IDs dos agentes e casos iniciais por UUIDs válidos. Para facilitar, você pode gerar novos UUIDs com a função `uuidv4()` e substituir nos arrays iniciais.
+
+Exemplo de UUID válido gerado:
+
+```
+"f47ac10b-58cc-4372-a567-0e02b2c3d479"
+```
+
+Assim, seu array de agentes ficaria parecido com:
+
+```js
 const agentes = [
     {
-        id: uuidv4(), // Gere um UUID válido para cada agente
+        id: "401bccf5-cf9e-489d-8412-446cd169a0f1", // já válido
         nome: "Rommel Carneiro",
         dataDeIncorporacao: "1992-10-04",
         cargo: "delegado"
     },
-    // ... demais agentes
+    {
+        id: "7e8f9a0b-1c2d-4e3f-9a6b-7c8d9e0f1a2b", // já válido
+        nome: "Ana Silva",
+        dataDeIncorporacao: "2010-03-15",
+        cargo: "inspetor"
+    },
+    {
+        id: "e7f9a0b1-2c3d-4e5f-9a6b-7c8d9e0f1a2b", // exemplo de UUID válido novo
+        nome: "Carlos Santos",
+        dataDeIncorporacao: "2015-07-22",
+        cargo: "inspetor"
+    },
+    // ...
 ];
 ```
 
-Ou, para manter dados fixos, gere os UUIDs usando um gerador online confiável e substitua os IDs antigos.
+**Recursos para aprender mais sobre UUID e validação:**  
+- [Validação de UUID em JavaScript](https://expressjs.com/pt-br/guide/routing.html) (documentação express sobre rotas e parâmetros)  
+- [Como gerar e validar UUIDs com o pacote `uuid`](https://www.npmjs.com/package/uuid)  
+- [Status HTTP 400 e 404 - MDN](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400) e [Status 404](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404)
 
 ---
 
-## 2. IDs de agentes usados nos casos também precisam ser UUIDs válidos e consistentes
+### 2. Filtros e buscas não estão funcionando corretamente
 
-Além dos IDs dos casos, os IDs de agentes atribuídos a cada caso (`agente_id`) também precisam ser UUIDs válidos **e** devem existir no array de agentes.
-
-No seu `casosRepository.js`, por exemplo:
+Você implementou filtros e buscas na sua API, por exemplo no `getAllCasos`:
 
 ```js
-{
-    id: "f5fb2ad5-22a8-4cb4-90f2-8733517a0d46",
-    titulo: "homicidio",
-    descricao: "...",
-    status: "aberto",
-    agente_id: "401bccf5-cf9e-489d-8412-446cd169a0f1"
+if (agente_id) {
+    if (!validateUUID(agente_id)) {
+        throw createValidationError('Parâmetros inválidos', { agente_id: 'agente_id deve ser um UUID válido' });
+    }
+    casos = casos.filter(caso => caso.agente_id === agente_id);
 }
 ```
 
-Aqui o `agente_id` deve ser um UUID válido e corresponder a um agente existente (com id igual) em `agentesRepository.js`.
-
-Se os agentes têm IDs inválidos, ou se o `agente_id` do caso não corresponde a nenhum agente, suas validações de criação e atualização de casos vão falhar.
-
----
-
-## 3. Falta de implementação ou inconsistência nos filtros avançados e mensagens de erro customizadas
-
-Você implementou filtros simples na busca de agentes e casos, como filtro por cargo e status, e busca por palavra-chave. Porém, os testes indicam que os filtros mais complexos (como ordenação por data de incorporação) e as mensagens de erro customizadas para argumentos inválidos não estão funcionando como esperado.
-
-Por exemplo, no `agentesController.js`, você tem:
+E no `getAllAgentes`:
 
 ```js
 if (cargo) {
-    agentes = agentesRepository.findByCargo(cargo);
-} else if (sort) {
+    agentes = agentes.filter(agente => agente.cargo.toLowerCase() === cargo.toLowerCase());
+}
+```
+
+Essas lógicas estão corretas, mas como os IDs iniciais são inválidos (ponto 1), essas filtragens acabam não retornando resultados, mesmo que os dados estejam lá.
+
+Além disso, não vi implementações explícitas para ordenar agentes por data de incorporação usando query string, embora você tenha uma função `findAllSorted` no repository, ela não está sendo usada no controller.
+
+Para implementar o filtro com ordenação, você poderia fazer algo assim no controller de agentes:
+
+```js
+if (sort) {
     const order = sort.startsWith('-') ? 'desc' : 'asc';
     const field = sort.replace('-', '');
     if (field === 'dataDeIncorporacao') {
         agentes = agentesRepository.findAllSorted(order);
-    } else {
-        agentes = agentesRepository.findAll();
-    }
-} else {
-    agentes = agentesRepository.findAll();
-}
-```
-
-Esse código está no caminho certo, mas pode ser melhorado para lidar com múltiplos filtros ao mesmo tempo (por exemplo, filtrar por cargo **e** ordenar por data) e para validar corretamente os parâmetros de query.
-
-Além disso, as mensagens de erro customizadas para parâmetros inválidos devem ser claras e consistentes, e seu middleware de tratamento de erros (`errorHandler`) deve formatar essas respostas corretamente.
-
----
-
-## 4. Organização da Estrutura de Diretórios — Está OK!
-
-Você organizou seu projeto exatamente como esperado:
-
-```
-.
-├── controllers/
-│   ├── agentesController.js
-│   └── casosController.js
-├── repositories/
-│   ├── agentesRepository.js
-│   └── casosRepository.js
-├── routes/
-│   ├── agentesRoutes.js
-│   └── casosRoutes.js
-├── utils/
-│   └── errorHandler.js
-├── server.js
-├── package.json
-└── docs/
-    └── swagger.js
-```
-
-Isso é excelente! Manter essa organização vai facilitar demais seu trabalho e o de quem for dar manutenção no projeto. 👍
-
----
-
-# Dicas e Exemplos para Correção 🚀
-
-### Corrigindo os IDs para UUIDs válidos
-
-No `repositories/agentesRepository.js`:
-
-```js
-const { v4: uuidv4 } = require('uuid');
-
-const agentes = [
-    {
-        id: "401bccf5-cf9e-489d-8412-446cd169a0f1a", // Certifique que seja UUID válido
-        nome: "Rommel Carneiro",
-        dataDeIncorporacao: "1992-10-04",
-        cargo: "delegado"
-    },
-    // Gere novos UUIDs válidos para os demais agentes
-];
-
-// Se preferir, gere os IDs no momento da inicialização:
-function initializeAgentes() {
-    return [
-        {
-            id: uuidv4(),
-            nome: "Rommel Carneiro",
-            dataDeIncorporacao: "1992-10-04",
-            cargo: "delegado"
-        },
-        // ...
-    ];
-}
-```
-
-Faça o mesmo para os casos e seus `agente_id`s.
-
----
-
-### Validando múltiplos filtros combinados (exemplo para agentes)
-
-No seu controller, você pode melhorar para:
-
-```js
-function getAllAgentes(req, res, next) {
-    try {
-        const { cargo, sort } = req.query;
-        let agentes = agentesRepository.findAll();
-
-        if (cargo) {
-            agentes = agentes.filter(agente => agente.cargo.toLowerCase() === cargo.toLowerCase());
-        }
-
-        if (sort) {
-            const order = sort.startsWith('-') ? 'desc' : 'asc';
-            const field = sort.replace('-', '');
-            if (field === 'dataDeIncorporacao') {
-                agentes = agentes.sort((a, b) => {
-                    const dateA = new Date(a.dataDeIncorporacao);
-                    const dateB = new Date(b.dataDeIncorporacao);
-                    return order === 'desc' ? dateB - dateA : dateA - dateB;
-                });
-            }
-        }
-
-        res.status(200).json(agentes);
-    } catch (error) {
-        next(error);
     }
 }
 ```
 
-Assim, você permite que os filtros sejam combinados, e não apenas um ou outro.
+Isso delega a ordenação para o repository, mantendo o controller limpo.
+
+**Dica:** Sempre que fizer filtros e ordenação, teste com dados válidos e IDs corretos para garantir que os filtros funcionem.
 
 ---
 
-### Tratamento de erros customizado
+### 3. Mensagens de erro customizadas e status HTTP
 
-No seu `utils/errorHandler.js`, certifique-se de que o middleware captura os erros personalizados e retorna um JSON claro, por exemplo:
+Você está usando funções para criar erros customizados, como:
+
+```js
+throw createValidationError('Parâmetros inválidos', errors);
+```
+
+Isso é excelente! Porém, para garantir que essas mensagens cheguem corretamente ao cliente, seu middleware `errorHandler` deve estar configurado para capturar esses erros e devolver um JSON com status e mensagem.
+
+No seu `server.js`, você já usa:
+
+```js
+app.use(errorHandler);
+```
+
+Só verifique se o `errorHandler` está implementado assim (exemplo simplificado):
 
 ```js
 function errorHandler(err, req, res, next) {
-    if (err.status && err.errors) {
-        return res.status(err.status).json({
-            message: err.message,
-            errors: err.errors
-        });
+    if (err.isValidationError) {
+        return res.status(400).json({ error: err.message, details: err.details });
     }
-
-    console.error(err);
-    res.status(500).json({ message: 'Erro interno no servidor' });
+    if (err.isNotFoundError) {
+        return res.status(404).json({ error: err.message });
+    }
+    // Outros erros
+    res.status(500).json({ error: 'Erro interno no servidor' });
 }
-
-module.exports = { errorHandler };
 ```
 
-Assim, quando você lança erros com `createValidationError` ou `createNotFoundError`, eles são enviados com status e detalhes claros.
+Assim, o cliente recebe respostas claras e padronizadas.
 
 ---
 
-# Recursos para você se aprofundar e arrasar! 🎓
+### 4. Organização do projeto e arquitetura
 
-- **Validação de dados e tratamento de erros em APIs Node.js/Express:**  
-  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
-  (Esse vídeo vai te ajudar a entender como validar dados e estruturar mensagens de erro personalizadas.)
+Sua estrutura de arquivos está correta e bem organizada! Você tem:
 
-- **Entendendo o protocolo HTTP e status codes:**  
-  https://youtu.be/RSZHvQomeKE  
-  (Muito útil para garantir que você use os status corretos como 200, 201, 204, 400 e 404.)
+```
+routes/
+controllers/
+repositories/
+utils/
+docs/
+server.js
+package.json
+```
 
-- **Documentação oficial do Express sobre roteamento:**  
-  https://expressjs.com/pt-br/guide/routing.html  
-  (Para você entender melhor como organizar suas rotas e middlewares.)
-
-- **Manipulação de arrays em JavaScript (filter, sort, find):**  
-  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI  
-  (Esses métodos são essenciais para implementar filtros e ordenações em memória.)
+Isso facilita muito a manutenção e a escalabilidade do projeto. Continue assim! 👍
 
 ---
 
-# Resumo rápido dos pontos para focar:
+## Recomendações de aprendizado 📚
 
-- ✅ Corrigir os IDs fixos dos agentes e casos para UUIDs válidos e consistentes entre si.  
-- ✅ Garantir que o `agente_id` nos casos corresponda a um agente existente com ID válido.  
-- ✅ Melhorar o suporte a filtros combinados e ordenação no controller de agentes e casos.  
-- ✅ Ajustar o middleware de erros para enviar mensagens customizadas claras e consistentes.  
-- ✅ Continuar mantendo a organização modular do projeto, que está muito boa!  
+Para te ajudar a corrigir e aprimorar seu projeto, recomendo os seguintes conteúdos:
+
+- **Fundamentos de API REST e Express.js:**  
+  [Criando uma API REST com Node.js e Express](https://youtu.be/RSZHvQomeKE) — ótimo para entender o básico e a estrutura do Express.
+
+- **Arquitetura MVC em Node.js:**  
+  [Arquitetura MVC em Node.js](https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH) — para entender melhor a separação entre rotas, controllers e repositories.
+
+- **Validação e tratamento de erros:**  
+  [Validação de dados em APIs Node.js/Express](https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_) — para garantir que seus dados estejam sempre corretos e que erros sejam tratados de forma amigável.
+
+- **Manipulação de arrays em JavaScript:**  
+  [Manipulando Arrays no JavaScript](https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI) — para melhorar suas funções de filtro, busca e ordenação.
 
 ---
 
-Marco, você já está no caminho certo, com uma base sólida e um código bem organizado! 🚀 Agora, focando nesses ajustes que te mostrei, sua API vai ficar muito mais robusta e pronta para o uso real. Continue firme, cada detalhe corrigido é um passo gigante no aprendizado! 💪✨
+## Resumo rápido dos pontos para focar 🚦
 
-Se precisar, revisite os recursos que te passei para fortalecer seu conhecimento. Estou torcendo por você! 🙌
+- **Corrigir os IDs iniciais dos agentes e casos para UUIDs válidos.** Isso é fundamental para que as validações e buscas funcionem corretamente.
 
-Um abraço de Code Buddy 🤖💙
+- **Garantir que os filtros e ordenações estejam usando os dados corretos e IDs válidos.** Utilize as funções do repository para manter o controller limpo.
+
+- **Verificar se o middleware de tratamento de erros (`errorHandler`) está capturando e respondendo com os status e mensagens corretas.**
+
+- **Continuar explorando e aperfeiçoando as mensagens de erro customizadas para melhorar a experiência do cliente da API.**
+
+- **Manter a boa organização do projeto e modularidade do código!**
+
+---
+
+Marco, você está no caminho certo e já tem uma base sólida! Com esses ajustes, sua API vai ficar muito mais robusta e alinhada com as melhores práticas. Continue praticando e explorando as dicas que deixei para você, e se precisar, volte aqui para tirar dúvidas! 🚀💪
+
+Boa codificação e até a próxima! 👋😄
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
