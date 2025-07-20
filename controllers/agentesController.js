@@ -4,20 +4,22 @@ const { createValidationError, createNotFoundError, validateRequiredFields, vali
 function getAllAgentes(req, res, next) {
     try {
         const { cargo, sort } = req.query;
-        let agentes;
+        let agentes = agentesRepository.findAll();
 
         if (cargo) {
-            agentes = agentesRepository.findByCargo(cargo);
-        } else if (sort) {
+            agentes = agentes.filter(agente => agente.cargo.toLowerCase() === cargo.toLowerCase());
+        }
+
+        if (sort) {
             const order = sort.startsWith('-') ? 'desc' : 'asc';
             const field = sort.replace('-', '');
             if (field === 'dataDeIncorporacao') {
-                agentes = agentesRepository.findAllSorted(order);
-            } else {
-                agentes = agentesRepository.findAll();
+                agentes = agentes.sort((a, b) => {
+                    const dateA = new Date(a.dataDeIncorporacao);
+                    const dateB = new Date(b.dataDeIncorporacao);
+                    return order === 'desc' ? dateB - dateA : dateA - dateB;
+                });
             }
-        } else {
-            agentes = agentesRepository.findAll();
         }
 
         res.status(200).json(agentes);

@@ -5,19 +5,25 @@ const { createValidationError, createNotFoundError, validateRequiredFields, vali
 function getAllCasos(req, res, next) {
     try {
         const { agente_id, status, q } = req.query;
-        let casos;
+        let casos = casosRepository.findAll();
 
         if (agente_id) {
             if (!validateUUID(agente_id)) {
                 throw createValidationError('Parâmetros inválidos', { agente_id: 'agente_id deve ser um UUID válido' });
             }
-            casos = casosRepository.findByAgenteId(agente_id);
-        } else if (status) {
-            casos = casosRepository.findByStatus(status);
-        } else if (q) {
-            casos = casosRepository.search(q);
-        } else {
-            casos = casosRepository.findAll();
+            casos = casos.filter(caso => caso.agente_id === agente_id);
+        }
+
+        if (status) {
+            casos = casos.filter(caso => caso.status.toLowerCase() === status.toLowerCase());
+        }
+
+        if (q) {
+            const queryLower = q.toLowerCase();
+            casos = casos.filter(caso => 
+                caso.titulo.toLowerCase().includes(queryLower) || 
+                caso.descricao.toLowerCase().includes(queryLower)
+            );
         }
 
         res.status(200).json(casos);
