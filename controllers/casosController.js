@@ -223,6 +223,21 @@ function deleteCaso(req, res, next) {
     }
 }
 
+function searchCasos(req, res, next) {
+    try {
+        const { q } = req.query;
+        
+        if (!q) {
+            throw createValidationError('Parâmetros inválidos', { q: 'Parâmetro de busca \'q\' é obrigatório' });
+        }
+
+        const casos = casosRepository.search(q);
+        res.status(200).json(casos);
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     getAllCasos,
     getCasoById,
@@ -230,5 +245,6 @@ module.exports = {
     createCaso,
     updateCaso,
     patchCaso,
-    deleteCaso
+    deleteCaso,
+    searchCasos
 }; 
