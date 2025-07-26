@@ -17,6 +17,13 @@ function getAllAgentes(req, res, next) {
         }
 
         if (sort) {
+            const validSortFields = ['dataDeIncorporacao', '-dataDeIncorporacao'];
+            if (!validSortFields.includes(sort)) {
+                throw createValidationError('Parâmetros inválidos', { 
+                    sort: "O campo 'sort' deve ser 'dataDeIncorporacao' ou '-dataDeIncorporacao'" 
+                });
+            }
+            
             const order = sort.startsWith('-') ? 'desc' : 'asc';
             const field = sort.replace('-', '');
             if (field === 'dataDeIncorporacao') {
