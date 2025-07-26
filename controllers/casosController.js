@@ -15,6 +15,12 @@ function getAllCasos(req, res, next) {
         }
 
         if (status) {
+            const validStatusValues = ['aberto', 'solucionado'];
+            if (!validStatusValues.includes(status.toLowerCase())) {
+                throw createValidationError('Parâmetros inválidos', { 
+                    status: "O campo 'status' deve ser 'aberto' ou 'solucionado'" 
+                });
+            }
             casos = casos.filter(caso => caso.status.toLowerCase() === status.toLowerCase());
         }
 
