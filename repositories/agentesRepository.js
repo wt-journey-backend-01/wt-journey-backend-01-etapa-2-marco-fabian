@@ -2,31 +2,31 @@ const { v4: uuidv4 } = require('uuid');
 
 const agentes = [
     {
-        id: "401bccf5-cf9e-489d-8412-446cd169a0f1",
+        id: "37593a38-92b6-4f9f-a6dc-5ceece7eda92",
         nome: "Rommel Carneiro",
         dataDeIncorporacao: "1992-10-04",
         cargo: "delegado"
     },
     {
-        id: "7e8f9a0b-1c2d-4e3f-9a6b-7c8d9e0f1a2b",
+        id: "c1e6a263-5670-4439-8f62-86ccb427ef8f",
         nome: "Ana Silva",
         dataDeIncorporacao: "2010-03-15",
         cargo: "inspetor"
     },
     {
-        id: "2b3c4d5e-6f7a-4b9c-8d1e-2f3a4b5c6d7e",
+        id: "7c3379da-8b1d-4b01-9237-9b1d28b5c4ab",
         nome: "Carlos Santos",
         dataDeIncorporacao: "2015-07-22",
         cargo: "inspetor"
     },
     {
-        id: "9f8e7d6c-5b4a-4928-a706-8592a1b0c3d4",
+        id: "e3f8a914-ac6f-412c-a8a1-c261bc572d3b",
         nome: "Maria Fernandes",
         dataDeIncorporacao: "2005-11-08",
         cargo: "delegado"
     },
     {
-        id: "6c5b4a39-2817-4695-bd7e-5a4b3c2d1e0f",
+        id: "97252664-cf09-472f-a7e3-0ed19614928b",
         nome: "José Pereira",
         dataDeIncorporacao: "2018-01-12",
         cargo: "inspetor"

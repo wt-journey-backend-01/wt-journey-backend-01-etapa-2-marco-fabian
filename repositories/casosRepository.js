@@ -2,46 +2,46 @@ const { v4: uuidv4 } = require('uuid');
 
 const casos = [
     {
-        id: "f5fb2ad5-22a8-4cb4-90f2-8733517a0d46",
+        id: "6cd036d0-546f-4941-aa5b-09a39335b04e",
         titulo: "homicidio",
         descricao: "Disparos foram reportados às 22:33 do dia 10/07/2007 na região do bairro União, resultando na morte da vítima, um homem de 45 anos.",
         status: "aberto",
-        agente_id: "401bccf5-cf9e-489d-8412-446cd169a0f1"
+        agente_id: "37593a38-92b6-4f9f-a6dc-5ceece7eda92"
     },
     {
-        id: "8b7a6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d",
+        id: "8b82d587-8e02-4fee-bc47-fc6cf2d9e4b2",
         titulo: "roubo a banco",
         descricao: "Assalto ao Banco Central na Av. Paulista às 14:30. Três indivíduos armados renderam funcionários e clientes, levando aproximadamente R$ 250.000.",
         status: "solucionado",
-        agente_id: "7e8f9a0b-1c2d-4e3f-9a6b-7c8d9e0f1a2b"
+        agente_id: "c1e6a263-5670-4439-8f62-86ccb427ef8f"
     },
     {
-        id: "3c2d1e0f-9a8b-47c6-b5e4-3a2b1c0d9e8f",
+        id: "7c7a8665-900a-4785-b693-32562063a371",
         titulo: "sequestro",
         descricao: "Empresário de 52 anos foi sequestrado no estacionamento de shopping. Família recebeu pedido de resgate de R$ 500.000.",
         status: "aberto",
-        agente_id: "2b3c4d5e-6f7a-4b9c-8d1e-2f3a4b5c6d7e"
+        agente_id: "7c3379da-8b1d-4b01-9237-9b1d28b5c4ab"
     },
     {
-        id: "9e8f7a6b-5c4d-4e2f-aa0b-9c8d7e6f5a4b",
+        id: "9a7c8754-8ea9-41fe-b5aa-cceef6ee73d1",
         titulo: "tráfico de drogas",
         descricao: "Operação no bairro da Liberdade resultou na apreensão de 50kg de cocaína e prisão de 12 suspeitos envolvidos na rede de distribuição.",
         status: "solucionado",
-        agente_id: "9f8e7d6c-5b4a-4928-a706-8592a1b0c3d4"
+        agente_id: "e3f8a914-ac6f-412c-a8a1-c261bc572d3b"
     },
     {
-        id: "5d4c3b2a-1098-47e6-b5a4-3c2d1e0f9a8b",
+        id: "b07edc71-3a95-4b80-913b-cbc61efa8294",
         titulo: "fraude eletrônica",
         descricao: "Esquema de phishing em aplicativo bancário resultou em prejuízo de R$ 1.2 milhão para mais de 200 vítimas.",
         status: "aberto",
-        agente_id: "6c5b4a39-2817-4695-bd7e-5a4b3c2d1e0f"
+        agente_id: "97252664-cf09-472f-a7e3-0ed19614928b"
     },
     {
-        id: "7f6e5d4c-3b2a-4908-a7e6-5a4b3c2d1e0f",
+        id: "7c10198e-72b0-49b8-8e1b-0a9dc7b8434e",
         titulo: "furto de veículos",
         descricao: "Quadrilha especializada em furto de carros de luxo foi identificada. Suspeitos agiam principalmente em estacionamentos de shopping centers.",
         status: "aberto",
-        agente_id: "401bccf5-cf9e-489d-8412-446cd169a0f1"
+        agente_id: "37593a38-92b6-4f9f-a6dc-5ceece7eda92"
     }
 ];
 
