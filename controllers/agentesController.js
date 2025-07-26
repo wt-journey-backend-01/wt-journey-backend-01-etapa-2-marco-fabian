@@ -7,6 +7,12 @@ function getAllAgentes(req, res, next) {
         let agentes = agentesRepository.findAll();
 
         if (cargo) {
+            const validCargos = ['inspetor', 'delegado'];
+            if (!validCargos.includes(cargo.toLowerCase())) {
+                throw createValidationError('Parâmetros inválidos', { 
+                    cargo: "O campo 'cargo' deve ser 'inspetor' ou 'delegado'" 
+                });
+            }
             agentes = agentes.filter(agente => agente.cargo.toLowerCase() === cargo.toLowerCase());
         }
 
