@@ -52,7 +52,7 @@ function validateRequiredFields(data, requiredFields) {
 
 function validateCasoStatus(status) {
     const validStatuses = ['aberto', 'solucionado'];
-    if (!validStatuses.includes(status)) {
+    if (!validStatuses.includes(status.toLowerCase())) {
         return "O campo 'status' pode ser somente 'aberto' ou 'solucionado'";
     }
     return null;

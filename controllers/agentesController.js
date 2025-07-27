@@ -4,7 +4,7 @@ const { createValidationError, createNotFoundError, validateRequiredFields, vali
 function getAllAgentes(req, res, next) {
     try {
         const { cargo, sort } = req.query;
-        let agentes;
+        let agentes = agentesRepository.findAll();
 
         if (cargo) {
             const validCargos = ['inspetor', 'delegado'];
@@ -13,9 +13,7 @@ function getAllAgentes(req, res, next) {
                     cargo: "O campo 'cargo' deve ser 'inspetor' ou 'delegado'" 
                 });
             }
-            agentes = agentesRepository.findByCargo(cargo);
-        } else {
-            agentes = agentesRepository.findAll();
+            agentes = agentes.filter(agente => agente.cargo.toLowerCase() === cargo.toLowerCase());
         }
 
         if (sort) {
@@ -27,15 +25,11 @@ function getAllAgentes(req, res, next) {
             }
             
             const order = sort.startsWith('-') ? 'desc' : 'asc';
-            if (cargo) {
-                agentes = agentes.sort((a, b) => {
-                    const dateA = new Date(a.dataDeIncorporacao);
-                    const dateB = new Date(b.dataDeIncorporacao);
-                    return order === 'desc' ? dateB - dateA : dateA - dateB;
-                });
-            } else {
-                agentes = agentesRepository.findAllSorted(order);
-            }
+            agentes = agentes.sort((a, b) => {
+                const dateA = new Date(a.dataDeIncorporacao);
+                const dateB = new Date(b.dataDeIncorporacao);
+                return order === 'desc' ? dateB - dateA : dateA - dateB;
+            });
         }
 
         res.status(200).json(agentes);
@@ -83,7 +77,7 @@ function createAgente(req, res, next) {
         }
 
         const validCargos = ['inspetor', 'delegado'];
-        if (dados.cargo && !validCargos.includes(dados.cargo)) {
+        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
             errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
         }
 
@@ -117,7 +111,7 @@ function updateAgente(req, res, next) {
         }
 
         const validCargos = ['inspetor', 'delegado'];
-        if (dados.cargo && !validCargos.includes(dados.cargo)) {
+        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
             errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
         }
 
@@ -155,7 +149,7 @@ function patchAgente(req, res, next) {
         }
 
         const validCargos = ['inspetor', 'delegado'];
-        if (dados.cargo && !validCargos.includes(dados.cargo)) {
+        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
             errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
         }
 
