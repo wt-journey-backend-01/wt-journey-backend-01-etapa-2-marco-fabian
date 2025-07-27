@@ -4,7 +4,7 @@ const { createValidationError, createNotFoundError, validateRequiredFields, vali
 function getAllAgentes(req, res, next) {
     try {
         const { cargo, sort } = req.query;
-        let agentes = agentesRepository.findAll();
+        let agentes;
 
         if (cargo) {
             const validCargos = ['inspetor', 'delegado'];
@@ -13,7 +13,6 @@ function getAllAgentes(req, res, next) {
                     cargo: "O campo 'cargo' deve ser 'inspetor' ou 'delegado'" 
                 });
             }
-            agentes = agentes.filter(agente => agente.cargo.toLowerCase() === cargo.toLowerCase());
         }
 
         if (sort) {
@@ -23,13 +22,23 @@ function getAllAgentes(req, res, next) {
                     sort: "O campo 'sort' deve ser 'dataDeIncorporacao' ou '-dataDeIncorporacao'" 
                 });
             }
-            
+        }
+
+        if (cargo && sort) {
+            agentes = agentesRepository.findByCargo(cargo);
             const order = sort.startsWith('-') ? 'desc' : 'asc';
             agentes = agentes.sort((a, b) => {
                 const dateA = new Date(a.dataDeIncorporacao);
                 const dateB = new Date(b.dataDeIncorporacao);
                 return order === 'desc' ? dateB - dateA : dateA - dateB;
             });
+        } else if (cargo) {
+            agentes = agentesRepository.findByCargo(cargo);
+        } else if (sort) {
+            const order = sort.startsWith('-') ? 'desc' : 'asc';
+            agentes = agentesRepository.findAllSorted(order);
+        } else {
+            agentes = agentesRepository.findAll();
         }
 
         res.status(200).json(agentes);
@@ -73,6 +82,16 @@ function createAgente(req, res, next) {
             const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
             if (dateError) {
                 errors.dataDeIncorporacao = dateError;
+            } else {
+                const data = new Date(dados.dataDeIncorporacao);
+                const hoje = new Date();
+                
+                const dataStr = data.toISOString().split('T')[0];
+                const hojeStr = hoje.toISOString().split('T')[0];
+                
+                if (dataStr > hojeStr) {
+                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
+                }
             }
         }
 
@@ -101,12 +120,23 @@ function updateAgente(req, res, next) {
             throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
         }
 
+        delete dados.id;
+
         const errors = {};
 
         if (dados.dataDeIncorporacao) {
             const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
             if (dateError) {
                 errors.dataDeIncorporacao = dateError;
+            } else {
+                const data = new Date(dados.dataDeIncorporacao);
+                const hoje = new Date();
+                const dataStr = data.toISOString().split('T')[0];
+                const hojeStr = hoje.toISOString().split('T')[0];
+                
+                if (dataStr > hojeStr) {
+                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
+                }
             }
         }
 
@@ -139,12 +169,23 @@ function patchAgente(req, res, next) {
             throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
         }
 
+        delete dados.id;
+
         const errors = {};
 
         if (dados.dataDeIncorporacao) {
             const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
             if (dateError) {
                 errors.dataDeIncorporacao = dateError;
+            } else {
+                const data = new Date(dados.dataDeIncorporacao);
+                const hoje = new Date();
+                const dataStr = data.toISOString().split('T')[0];
+                const hojeStr = hoje.toISOString().split('T')[0];
+                
+                if (dataStr > hojeStr) {
+                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
+                }
             }
         }
 
