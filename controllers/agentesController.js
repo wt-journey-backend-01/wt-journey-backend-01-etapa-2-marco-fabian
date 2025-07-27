@@ -120,17 +120,18 @@ function updateAgente(req, res, next) {
             throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
         }
 
-        delete dados.id;
+        const { id: _, ...dadosSemId } = dados;
 
         const errors = {};
 
-        if (dados.dataDeIncorporacao) {
-            const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
+        if (dadosSemId.dataDeIncorporacao) {
+            const dateError = validateDateFormat(dadosSemId.dataDeIncorporacao, 'dataDeIncorporacao');
             if (dateError) {
                 errors.dataDeIncorporacao = dateError;
             } else {
-                const data = new Date(dados.dataDeIncorporacao);
+                const data = new Date(dadosSemId.dataDeIncorporacao);
                 const hoje = new Date();
+                
                 const dataStr = data.toISOString().split('T')[0];
                 const hojeStr = hoje.toISOString().split('T')[0];
                 
@@ -141,7 +142,7 @@ function updateAgente(req, res, next) {
         }
 
         const validCargos = ['inspetor', 'delegado'];
-        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
+        if (dadosSemId.cargo && !validCargos.includes(dadosSemId.cargo.toLowerCase())) {
             errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
         }
 
@@ -149,7 +150,7 @@ function updateAgente(req, res, next) {
             throw createValidationError('Parâmetros inválidos', errors);
         }
 
-        const agenteAtualizado = agentesRepository.updateById(id, dados);
+        const agenteAtualizado = agentesRepository.updateById(id, dadosSemId);
         if (!agenteAtualizado) {
             throw createNotFoundError('Agente não encontrado');
         }
@@ -169,17 +170,18 @@ function patchAgente(req, res, next) {
             throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
         }
 
-        delete dados.id;
+        const { id: _, ...dadosSemId } = dados;
 
         const errors = {};
 
-        if (dados.dataDeIncorporacao) {
-            const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
+        if (dadosSemId.dataDeIncorporacao) {
+            const dateError = validateDateFormat(dadosSemId.dataDeIncorporacao, 'dataDeIncorporacao');
             if (dateError) {
                 errors.dataDeIncorporacao = dateError;
             } else {
-                const data = new Date(dados.dataDeIncorporacao);
+                const data = new Date(dadosSemId.dataDeIncorporacao);
                 const hoje = new Date();
+                
                 const dataStr = data.toISOString().split('T')[0];
                 const hojeStr = hoje.toISOString().split('T')[0];
                 
@@ -190,7 +192,7 @@ function patchAgente(req, res, next) {
         }
 
         const validCargos = ['inspetor', 'delegado'];
-        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
+        if (dadosSemId.cargo && !validCargos.includes(dadosSemId.cargo.toLowerCase())) {
             errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
         }
 
@@ -198,7 +200,7 @@ function patchAgente(req, res, next) {
             throw createValidationError('Parâmetros inválidos', errors);
         }
 
-        const agenteAtualizado = agentesRepository.updateById(id, dados);
+        const agenteAtualizado = agentesRepository.updateById(id, dadosSemId);
         if (!agenteAtualizado) {
             throw createNotFoundError('Agente não encontrado');
         }

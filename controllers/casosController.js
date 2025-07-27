@@ -153,22 +153,22 @@ function updateCaso(req, res, next) {
             throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
         }
 
-        delete dados.id;
+        const { id: _, ...dadosSemId } = dados;
 
         const errors = {};
 
-        if (dados.status) {
-            const statusError = validateCasoStatus(dados.status);
+        if (dadosSemId.status) {
+            const statusError = validateCasoStatus(dadosSemId.status);
             if (statusError) {
                 errors.status = statusError;
             }
         }
 
-        if (dados.agente_id) {
-            if (!validateUUID(dados.agente_id)) {
+        if (dadosSemId.agente_id) {
+            if (!validateUUID(dadosSemId.agente_id)) {
                 errors.agente_id = 'agente_id deve ser um UUID válido';
             } else {
-                const agente = agentesRepository.findById(dados.agente_id);
+                const agente = agentesRepository.findById(dadosSemId.agente_id);
                 if (!agente) {
                     errors.agente_id = 'Agente não encontrado';
                 }
@@ -179,7 +179,7 @@ function updateCaso(req, res, next) {
             throw createValidationError('Parâmetros inválidos', errors);
         }
 
-        const casoAtualizado = casosRepository.updateById(id, dados);
+        const casoAtualizado = casosRepository.updateById(id, dadosSemId);
         if (!casoAtualizado) {
             throw createNotFoundError('Caso não encontrado');
         }
@@ -199,22 +199,22 @@ function patchCaso(req, res, next) {
             throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
         }
 
-        delete dados.id;
+        const { id: _, ...dadosSemId } = dados;
 
         const errors = {};
 
-        if (dados.status) {
-            const statusError = validateCasoStatus(dados.status);
+        if (dadosSemId.status) {
+            const statusError = validateCasoStatus(dadosSemId.status);
             if (statusError) {
                 errors.status = statusError;
             }
         }
 
-        if (dados.agente_id) {
-            if (!validateUUID(dados.agente_id)) {
+        if (dadosSemId.agente_id) {
+            if (!validateUUID(dadosSemId.agente_id)) {
                 errors.agente_id = 'agente_id deve ser um UUID válido';
             } else {
-                const agente = agentesRepository.findById(dados.agente_id);
+                const agente = agentesRepository.findById(dadosSemId.agente_id);
                 if (!agente) {
                     errors.agente_id = 'Agente não encontrado';
                 }
@@ -225,7 +225,7 @@ function patchCaso(req, res, next) {
             throw createValidationError('Parâmetros inválidos', errors);
         }
 
-        const casoAtualizado = casosRepository.updateById(id, dados);
+        const casoAtualizado = casosRepository.updateById(id, dadosSemId);
         if (!casoAtualizado) {
             throw createNotFoundError('Caso não encontrado');
         }
