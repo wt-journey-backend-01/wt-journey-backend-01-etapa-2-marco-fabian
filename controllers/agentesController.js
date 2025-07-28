@@ -1,5 +1,7 @@
 const agentesRepository = require('../repositories/agentesRepository');
-const { createValidationError, createNotFoundError, validateRequiredFields, validateDateFormat, validateUUID } = require('../utils/errorHandler');
+const { createValidationError } = require('../utils/errorHandler');
+const { validateAgenteData } = require('../utils/validators');
+const { handleCreate, handleUpdate, handlePatch, handleGetById, handleDelete } = require('../utils/controllerHelpers');
 
 function getAllAgentes(req, res, next) {
     try {
@@ -48,186 +50,30 @@ function getAllAgentes(req, res, next) {
 }
 
 function getAgenteById(req, res, next) {
-    try {
-        const { id } = req.params;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const agente = agentesRepository.findById(id);
-        if (!agente) {
-            throw createNotFoundError('Agente não encontrado');
-        }
-
-        res.status(200).json(agente);
-    } catch (error) {
-        next(error);
-    }
+    handleGetById(agentesRepository, 'Agente', req, res, next);
 }
 
 function createAgente(req, res, next) {
-    try {
-        const dados = req.body;
-        const requiredFields = ['nome', 'dataDeIncorporacao', 'cargo'];
-        
-        const validationErrors = validateRequiredFields(dados, requiredFields);
-        const errors = {};
-
-        if (validationErrors) {
-            Object.assign(errors, validationErrors);
-        }
-
-        if (dados.dataDeIncorporacao) {
-            const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
-            if (dateError) {
-                errors.dataDeIncorporacao = dateError;
-            } else {
-                const data = new Date(dados.dataDeIncorporacao);
-                const hoje = new Date();
-                
-                const dataStr = data.toISOString().split('T')[0];
-                const hojeStr = hoje.toISOString().split('T')[0];
-                
-                if (dataStr > hojeStr) {
-                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
-                }
-            }
-        }
-
-        const validCargos = ['inspetor', 'delegado'];
-        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
-            errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
-        }
-
-        if (Object.keys(errors).length > 0) {
-            throw createValidationError('Parâmetros inválidos', errors);
-        }
-
-        const novoAgente = agentesRepository.create(dados);
-        res.status(201).json(novoAgente);
-    } catch (error) {
-        next(error);
-    }
+    const validateCreate = (dados) => {
+        validateAgenteData(dados, false);
+    };
+    
+    handleCreate(agentesRepository, validateCreate, req, res, next);
 }
 
 function updateAgente(req, res, next) {
-    try {
-        const { id } = req.params;
-        const dados = req.body;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const { id: _, ...dadosSemId } = dados;
-
-        const errors = {};
-
-        if (dadosSemId.dataDeIncorporacao) {
-            const dateError = validateDateFormat(dadosSemId.dataDeIncorporacao, 'dataDeIncorporacao');
-            if (dateError) {
-                errors.dataDeIncorporacao = dateError;
-            } else {
-                const data = new Date(dadosSemId.dataDeIncorporacao);
-                const hoje = new Date();
-                
-                const dataStr = data.toISOString().split('T')[0];
-                const hojeStr = hoje.toISOString().split('T')[0];
-                
-                if (dataStr > hojeStr) {
-                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
-                }
-            }
-        }
-
-        const validCargos = ['inspetor', 'delegado'];
-        if (dadosSemId.cargo && !validCargos.includes(dadosSemId.cargo.toLowerCase())) {
-            errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
-        }
-
-        if (Object.keys(errors).length > 0) {
-            throw createValidationError('Parâmetros inválidos', errors);
-        }
-
-        const agenteAtualizado = agentesRepository.updateById(id, dadosSemId);
-        if (!agenteAtualizado) {
-            throw createNotFoundError('Agente não encontrado');
-        }
-
-        res.status(200).json(agenteAtualizado);
-    } catch (error) {
-        next(error);
-    }
+    handleUpdate(agentesRepository, validateAgenteData, req, res, next);
 }
 
 function patchAgente(req, res, next) {
-    try {
-        const { id } = req.params;
-        const dados = req.body;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const { id: _, ...dadosSemId } = dados;
-
-        const errors = {};
-
-        if (dadosSemId.dataDeIncorporacao) {
-            const dateError = validateDateFormat(dadosSemId.dataDeIncorporacao, 'dataDeIncorporacao');
-            if (dateError) {
-                errors.dataDeIncorporacao = dateError;
-            } else {
-                const data = new Date(dadosSemId.dataDeIncorporacao);
-                const hoje = new Date();
-                
-                const dataStr = data.toISOString().split('T')[0];
-                const hojeStr = hoje.toISOString().split('T')[0];
-                
-                if (dataStr > hojeStr) {
-                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
-                }
-            }
-        }
-
-        const validCargos = ['inspetor', 'delegado'];
-        if (dadosSemId.cargo && !validCargos.includes(dadosSemId.cargo.toLowerCase())) {
-            errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
-        }
-
-        if (Object.keys(errors).length > 0) {
-            throw createValidationError('Parâmetros inválidos', errors);
-        }
-
-        const agenteAtualizado = agentesRepository.updateById(id, dadosSemId);
-        if (!agenteAtualizado) {
-            throw createNotFoundError('Agente não encontrado');
-        }
-
-        res.status(200).json(agenteAtualizado);
-    } catch (error) {
-        next(error);
-    }
+    const validatePatch = (dados) => {
+        validateAgenteData(dados, false);
+    };
+    handlePatch(agentesRepository, validatePatch, req, res, next);
 }
 
 function deleteAgente(req, res, next) {
-    try {
-        const { id } = req.params;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const deleted = agentesRepository.deleteById(id);
-        if (!deleted) {
-            throw createNotFoundError('Agente não encontrado');
-        }
-
-        res.status(204).send();
-    } catch (error) {
-        next(error);
-    }
+    handleDelete(agentesRepository, 'Agente', req, res, next);
 }
 
 module.exports = {

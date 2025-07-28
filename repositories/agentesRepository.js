@@ -23,6 +23,14 @@ function updateById(id, dadosAtualizados) {
     const index = agentes.findIndex(agente => agente.id === id);
     if (index === -1) return null;
     
+    agentes[index] = { id, ...dadosAtualizados };
+    return agentes[index];
+}
+
+function patchById(id, dadosAtualizados) {
+    const index = agentes.findIndex(agente => agente.id === id);
+    if (index === -1) return null;
+    
     agentes[index] = { ...agentes[index], ...dadosAtualizados };
     return agentes[index];
 }
@@ -57,6 +65,7 @@ module.exports = {
     findById,
     create,
     updateById,
+    patchById,
     deleteById,
     findByCargo,
     findAllSorted

@@ -23,6 +23,14 @@ function updateById(id, dadosAtualizados) {
     const index = casos.findIndex(caso => caso.id === id);
     if (index === -1) return null;
     
+    casos[index] = { id, ...dadosAtualizados };
+    return casos[index];
+}
+
+function patchById(id, dadosAtualizados) {
+    const index = casos.findIndex(caso => caso.id === id);
+    if (index === -1) return null;
+    
     casos[index] = { ...casos[index], ...dadosAtualizados };
     return casos[index];
 }
@@ -56,6 +64,7 @@ module.exports = {
     findById,
     create,
     updateById,
+    patchById,
     deleteById,
     findByAgenteId,
     findByStatus,

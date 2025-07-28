@@ -1,6 +1,8 @@
 const casosRepository = require('../repositories/casosRepository');
 const agentesRepository = require('../repositories/agentesRepository');
-const { createValidationError, createNotFoundError, validateRequiredFields, validateCasoStatus, validateUUID } = require('../utils/errorHandler');
+const { createValidationError, createNotFoundError, validateUUID } = require('../utils/errorHandler');
+const { validateCasoData } = require('../utils/validators');
+const { handleCreate, handleUpdate, handlePatch, handleGetById, handleDelete } = require('../utils/controllerHelpers');
 
 function getAllCasos(req, res, next) {
     try {
@@ -61,22 +63,7 @@ function getAllCasos(req, res, next) {
 }
 
 function getCasoById(req, res, next) {
-    try {
-        const { id } = req.params;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const caso = casosRepository.findById(id);
-        if (!caso) {
-            throw createNotFoundError('Caso não encontrado');
-        }
-
-        res.status(200).json(caso);
-    } catch (error) {
-        next(error);
-    }
+    handleGetById(casosRepository, 'Caso', req, res, next);
 }
 
 function getAgenteFromCaso(req, res, next) {
@@ -104,155 +91,31 @@ function getAgenteFromCaso(req, res, next) {
 }
 
 function createCaso(req, res, next) {
-    try {
-        const dados = req.body;
-        const requiredFields = ['titulo', 'descricao', 'status', 'agente_id'];
-        
-        const validationErrors = validateRequiredFields(dados, requiredFields);
-        const errors = {};
-
-        if (validationErrors) {
-            Object.assign(errors, validationErrors);
-        }
-
-        if (dados.status) {
-            const statusError = validateCasoStatus(dados.status);
-            if (statusError) {
-                errors.status = statusError;
-            }
-        }
-
-        if (dados.agente_id) {
-            if (!validateUUID(dados.agente_id)) {
-                errors.agente_id = 'agente_id deve ser um UUID válido';
-            } else {
-                const agente = agentesRepository.findById(dados.agente_id);
-                if (!agente) {
-                    errors.agente_id = 'Agente não encontrado';
-                }
-            }
-        }
-
-        if (Object.keys(errors).length > 0) {
-            throw createValidationError('Parâmetros inválidos', errors);
-        }
-
-        const novoCaso = casosRepository.create(dados);
-        res.status(201).json(novoCaso);
-    } catch (error) {
-        next(error);
-    }
+    const validateCreate = (dados) => {
+        validateCasoData(dados, agentesRepository, false);
+    };
+    
+    handleCreate(casosRepository, validateCreate, req, res, next);
 }
 
 function updateCaso(req, res, next) {
-    try {
-        const { id } = req.params;
-        const dados = req.body;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const { id: _, ...dadosSemId } = dados;
-
-        const errors = {};
-
-        if (dadosSemId.status) {
-            const statusError = validateCasoStatus(dadosSemId.status);
-            if (statusError) {
-                errors.status = statusError;
-            }
-        }
-
-        if (dadosSemId.agente_id) {
-            if (!validateUUID(dadosSemId.agente_id)) {
-                errors.agente_id = 'agente_id deve ser um UUID válido';
-            } else {
-                const agente = agentesRepository.findById(dadosSemId.agente_id);
-                if (!agente) {
-                    errors.agente_id = 'Agente não encontrado';
-                }
-            }
-        }
-
-        if (Object.keys(errors).length > 0) {
-            throw createValidationError('Parâmetros inválidos', errors);
-        }
-
-        const casoAtualizado = casosRepository.updateById(id, dadosSemId);
-        if (!casoAtualizado) {
-            throw createNotFoundError('Caso não encontrado');
-        }
-
-        res.status(200).json(casoAtualizado);
-    } catch (error) {
-        next(error);
-    }
+    const validateWithAgentes = (dados, isUpdate) => {
+        validateCasoData(dados, agentesRepository, isUpdate);
+    };
+    
+    handleUpdate(casosRepository, validateWithAgentes, req, res, next);
 }
 
 function patchCaso(req, res, next) {
-    try {
-        const { id } = req.params;
-        const dados = req.body;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const { id: _, ...dadosSemId } = dados;
-
-        const errors = {};
-
-        if (dadosSemId.status) {
-            const statusError = validateCasoStatus(dadosSemId.status);
-            if (statusError) {
-                errors.status = statusError;
-            }
-        }
-
-        if (dadosSemId.agente_id) {
-            if (!validateUUID(dadosSemId.agente_id)) {
-                errors.agente_id = 'agente_id deve ser um UUID válido';
-            } else {
-                const agente = agentesRepository.findById(dadosSemId.agente_id);
-                if (!agente) {
-                    errors.agente_id = 'Agente não encontrado';
-                }
-            }
-        }
-
-        if (Object.keys(errors).length > 0) {
-            throw createValidationError('Parâmetros inválidos', errors);
-        }
-
-        const casoAtualizado = casosRepository.updateById(id, dadosSemId);
-        if (!casoAtualizado) {
-            throw createNotFoundError('Caso não encontrado');
-        }
-
-        res.status(200).json(casoAtualizado);
-    } catch (error) {
-        next(error);
-    }
+    const validatePatch = (dados) => {
+        validateCasoData(dados, agentesRepository, false);
+    };
+    
+    handlePatch(casosRepository, validatePatch, req, res, next);
 }
 
 function deleteCaso(req, res, next) {
-    try {
-        const { id } = req.params;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
-        const deleted = casosRepository.deleteById(id);
-        if (!deleted) {
-            throw createNotFoundError('Caso não encontrado');
-        }
-
-        res.status(204).send();
-    } catch (error) {
-        next(error);
-    }
+    handleDelete(casosRepository, 'Caso', req, res, next);
 }
 
 module.exports = {
