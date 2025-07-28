@@ -31,7 +31,8 @@ function patchById(id, dadosAtualizados) {
     const index = casos.findIndex(caso => caso.id === id);
     if (index === -1) return null;
     
-    casos[index] = { ...casos[index], ...dadosAtualizados };
+    const { id: _, ...dadosSemId } = dadosAtualizados;
+    casos[index] = { ...casos[index], ...dadosSemId };
     return casos[index];
 }
 

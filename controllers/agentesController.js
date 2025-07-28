@@ -1,5 +1,5 @@
 const agentesRepository = require('../repositories/agentesRepository');
-const { createValidationError } = require('../utils/errorHandler');
+const { createValidationError, validateDateFormat } = require('../utils/errorHandler');
 const { validateAgenteData } = require('../utils/validators');
 const { handleCreate, handleUpdate, handlePatch, handleGetById, handleDelete } = require('../utils/controllerHelpers');
 
@@ -67,7 +67,31 @@ function updateAgente(req, res, next) {
 
 function patchAgente(req, res, next) {
     const validatePatch = (dados) => {
-        validateAgenteData(dados, false);
+        const errors = {};
+        
+        if (dados.dataDeIncorporacao) {
+            const dateError = validateDateFormat(dados.dataDeIncorporacao, 'dataDeIncorporacao');
+            if (dateError) {
+                errors.dataDeIncorporacao = dateError;
+            } else {
+                const data = new Date(dados.dataDeIncorporacao);
+                const hoje = new Date();
+                const dataStr = data.toISOString().split('T')[0];
+                const hojeStr = hoje.toISOString().split('T')[0];
+                if (dataStr > hojeStr) {
+                    errors.dataDeIncorporacao = 'A data de incorporação não pode ser no futuro';
+                }
+            }
+        }
+        
+        const validCargos = ['inspetor', 'delegado'];
+        if (dados.cargo && !validCargos.includes(dados.cargo.toLowerCase())) {
+            errors.cargo = "O campo 'cargo' deve ser 'inspetor' ou 'delegado'";
+        }
+        
+        if (Object.keys(errors).length > 0) {
+            throw createValidationError('Parâmetros inválidos', errors);
+        }
     };
     handlePatch(agentesRepository, validatePatch, req, res, next);
 }

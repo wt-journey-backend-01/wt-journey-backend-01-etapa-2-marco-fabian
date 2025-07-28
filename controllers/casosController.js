@@ -1,6 +1,6 @@
 const casosRepository = require('../repositories/casosRepository');
 const agentesRepository = require('../repositories/agentesRepository');
-const { createValidationError, createNotFoundError, validateUUID } = require('../utils/errorHandler');
+const { createValidationError, createNotFoundError, validateUUID, validateCasoStatus } = require('../utils/errorHandler');
 const { validateCasoData } = require('../utils/validators');
 const { handleCreate, handleUpdate, handlePatch, handleGetById, handleDelete } = require('../utils/controllerHelpers');
 
@@ -108,7 +108,30 @@ function updateCaso(req, res, next) {
 
 function patchCaso(req, res, next) {
     const validatePatch = (dados) => {
-        validateCasoData(dados, agentesRepository, false);
+        // Para PATCH, só validar campos que estão presentes
+        const errors = {};
+        
+        if (dados.status) {
+            const statusError = validateCasoStatus(dados.status);
+            if (statusError) {
+                errors.status = statusError;
+            }
+        }
+        
+        if (dados.agente_id) {
+            if (!validateUUID(dados.agente_id)) {
+                errors.agente_id = 'agente_id deve ser um UUID válido';
+            } else {
+                const agente = agentesRepository.findById(dados.agente_id);
+                if (!agente) {
+                    throw createNotFoundError('Agente não encontrado');
+                }
+            }
+        }
+        
+        if (Object.keys(errors).length > 0) {
+            throw createValidationError('Parâmetros inválidos', errors);
+        }
     };
     
     handlePatch(casosRepository, validatePatch, req, res, next);

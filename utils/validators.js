@@ -3,12 +3,10 @@ const { createValidationError, createNotFoundError, validateRequiredFields, vali
 function validateAgenteData(dados, isUpdate = false) {
     const errors = {};
     
-    if (isUpdate) {
-        const requiredFields = ['nome', 'dataDeIncorporacao', 'cargo'];
-        const validationErrors = validateRequiredFields(dados, requiredFields);
-        if (validationErrors) {
-            Object.assign(errors, validationErrors);
-        }
+    const requiredFields = ['nome', 'dataDeIncorporacao', 'cargo'];
+    const validationErrors = validateRequiredFields(dados, requiredFields);
+    if (validationErrors) {
+        Object.assign(errors, validationErrors);
     }
     
     if (dados.dataDeIncorporacao) {
@@ -39,12 +37,10 @@ function validateAgenteData(dados, isUpdate = false) {
 function validateCasoData(dados, agentesRepository, isUpdate = false) {
     const errors = {};
     
-    if (isUpdate) {
-        const requiredFields = ['titulo', 'descricao', 'status', 'agente_id'];
-        const validationErrors = validateRequiredFields(dados, requiredFields);
-        if (validationErrors) {
-            Object.assign(errors, validationErrors);
-        }
+    const requiredFields = ['titulo', 'descricao', 'status', 'agente_id'];
+    const validationErrors = validateRequiredFields(dados, requiredFields);
+    if (validationErrors) {
+        Object.assign(errors, validationErrors);
     }
 
     if (dados.status) {
