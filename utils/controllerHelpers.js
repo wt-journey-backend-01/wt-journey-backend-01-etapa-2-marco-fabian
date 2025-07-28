@@ -1,5 +1,4 @@
-const { createNotFoundError, validateUUID } = require('./errorHandler');
-const { validateIdParam } = require('./validators');
+const { createNotFoundError, validateUUID, createValidationError } = require('./errorHandler');
 
 function handleCreate(repository, validateFn, req, res, next) {
     try {
@@ -68,7 +67,9 @@ function handleGetById(repository, entityName, req, res, next) {
     try {
         const { id } = req.params;
 
-        validateIdParam(id);
+        if (!validateUUID(id)) {
+            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
+        }
 
         const item = repository.findById(id);
         if (!item) {
@@ -85,7 +86,9 @@ function handleDelete(repository, entityName, req, res, next) {
     try {
         const { id } = req.params;
 
-        validateIdParam(id);
+        if (!validateUUID(id)) {
+            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
+        }
 
         const deleted = repository.deleteById(id);
         if (!deleted) {
