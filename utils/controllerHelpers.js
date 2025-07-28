@@ -18,13 +18,13 @@ function handleUpdate(repository, validateFn, req, res, next) {
         const { id } = req.params;
         const dados = req.body;
 
-        if (validateUUID(id)) {
-            const existingItem = repository.findById(id);
-            if (!existingItem) {
-                throw createNotFoundError(getNotFoundMessage(repository.name));
-            }
-        } else {
-            validateIdParam(id);
+        if (!validateUUID(id)) {
+            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
+        }
+        
+        const existingItem = repository.findById(id);
+        if (!existingItem) {
+            throw createNotFoundError(getNotFoundMessage(repository.name));
         }
         
         const { id: _, ...dadosSemId } = dados;
@@ -42,13 +42,13 @@ function handlePatch(repository, validateFn, req, res, next) {
         const { id } = req.params;
         const dados = req.body;
 
-        if (validateUUID(id)) {
-            const existingItem = repository.findById(id);
-            if (!existingItem) {
-                throw createNotFoundError(getNotFoundMessage(repository.name));
-            }
-        } else {
-            validateIdParam(id);
+        if (!validateUUID(id)) {
+            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
+        }
+        
+        const existingItem = repository.findById(id);
+        if (!existingItem) {
+            throw createNotFoundError(getNotFoundMessage(repository.name));
         }
         
         const { id: _, ...dadosSemId } = dados;

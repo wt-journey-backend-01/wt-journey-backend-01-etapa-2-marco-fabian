@@ -66,14 +66,7 @@ function validateCasoData(dados, agentesRepository, isUpdate = false) {
     }
 }
 
-function validateIdParam(id) {
-    if (!validateUUID(id)) {
-        throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-    }
-}
-
 module.exports = {
     validateAgenteData,
-    validateCasoData,
-    validateIdParam
+    validateCasoData
 }; 
