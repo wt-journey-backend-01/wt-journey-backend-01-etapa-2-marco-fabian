@@ -18,10 +18,6 @@ function handleUpdate(repository, validateFn, req, res, next) {
         const { id } = req.params;
         const dados = req.body;
 
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-        
         const existingItem = repository.findById(id);
         if (!existingItem) {
             throw createNotFoundError(getNotFoundMessage(repository.name));
@@ -42,10 +38,6 @@ function handlePatch(repository, validateFn, req, res, next) {
         const { id } = req.params;
         const dados = req.body;
 
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-        
         const existingItem = repository.findById(id);
         if (!existingItem) {
             throw createNotFoundError(getNotFoundMessage(repository.name));
@@ -67,10 +59,6 @@ function handleGetById(repository, entityName, req, res, next) {
     try {
         const { id } = req.params;
 
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
-
         const item = repository.findById(id);
         if (!item) {
             throw createNotFoundError(`${entityName} não encontrado`);
@@ -85,10 +73,6 @@ function handleGetById(repository, entityName, req, res, next) {
 function handleDelete(repository, entityName, req, res, next) {
     try {
         const { id } = req.params;
-
-        if (!validateUUID(id)) {
-            throw createValidationError('Parâmetros inválidos', { id: 'ID deve ser um UUID válido' });
-        }
 
         const deleted = repository.deleteById(id);
         if (!deleted) {
